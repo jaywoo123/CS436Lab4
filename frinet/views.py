@@ -16,6 +16,7 @@ from django.contrib.auth import logout, login, authenticate
 from .models import *
 from .serializers import UserSerializer, PostSerializer
 
+from django.core.cache import cache
 
 def index(request):
     return render_to_response('index.html')
@@ -35,23 +36,26 @@ def get_friends(request):
 def get_posts(request):
     user = request._request.user
 
-    # TODO: Your caching logic here
+    obj = cache.get(user)
+    if obj:
+        return JsonResponse(obj, safe=False)
+    else:
 
-    
-    all_users = list(user.friends.all())
-    all_users.append(user)
+        all_users = list(user.friends.all())
+        all_users.append(user)
 
-    all_posts = []
-    for u in all_users:
-        all_posts += [p for p in Post.objects.filter(user=u)]
+        all_posts = []
+        for u in all_users:
+            all_posts += [p for p in Post.objects.filter(user=u)]
 
-    # sort all the post by timeline
-    all_posts = sorted(all_posts, key=lambda x: x.date, reverse=True)
+        # sort all the post by timeline
+        all_posts = sorted(all_posts, key=lambda x: x.date, reverse=True)
 
-    # limit the post number to 25 and serialize the post
-    post_ser = [PostSerializer(p).data for p in all_posts[:25]]
-    
-    return JsonResponse(post_ser, safe=False)
+        # limit the post number to 25 and serialize the post
+        post_ser = [PostSerializer(p).data for p in all_posts[:25]]
+        cache.set(user, post_ser, 30)
+
+        return JsonResponse(post_ser, safe=False)
 
 
 @api_view(['POST'])

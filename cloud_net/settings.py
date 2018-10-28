@@ -15,6 +15,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -25,7 +26,7 @@ SECRET_KEY = 'd*j@x24s9^qu#r(jcm48)t37&7i++(&h&#l^ytr&=y1@p3y2(&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["18.224.153.129"]
 
 
 # Application definition
@@ -73,14 +74,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cloud_net.wsgi.application'
 
+# Cache
+CACHES = {
+    'default':{
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+    # SQLLite
+        'ENGINE' : 'django.db.backends.sqlite3',
+        'NAME' : os.path.join(BASE_DIR, 'db.sqlite3')
+
+    # MYSQL Database
+       # 'ENGINE': 'django.db.backends.mysql',
+       # 'NAME': 'frinet',
+       # 'USER': 'admin',
+       # 'PASSWORD': 'ShanJae',
+       # 'HOST': '127.0.0.1',
+       # 'PORT': '3306'
     }
 }
 
